@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5f2;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #6a11cb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .issues-container {
+            display: grid;
+            gap: 25px;
+        }
+        
+        .issue-card {
+            border-left: 4px solid #6a11cb;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+        }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .issue-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .issue-date {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .issue-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .comments-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #e1e5f2;
+        }
+        
+        .comment {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: #2575fc;
+        }
+        
+        .comment-date {
+            font-size: 0.85rem;
+            color: #95a5a6;
+        }
+        
+        .comment-content {
+            line-height: 1.5;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .issue-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-bug"></i> Issue Tracker</h1>
+            <p>Suggest problems, request features, and discuss solutions with the community</p>
+        </header>
+        
+        <main>
+            <!-- Suggestion Form -->
+            <div class="card">
+                <h2>Suggest a New Issue</h2>
+                <form id="issueForm">
+                    <div class="form-group">
+                        <label for="issueTitle">Issue Title</label>
+                        <input type="text" id="issueTitle" placeholder="Briefly describe your issue" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription">Description</label>
+                        <textarea id="issueDescription" placeholder="Provide details about the issue, steps to reproduce, or your feature request..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i> Submit Issue
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Issues List -->
+            <div class="card">
+                <h2>Existing Issues</h2>
+                <div id="issuesContainer" class="issues-container">
+                    <!-- Issues will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize data from localStorage or create empty arrays
+        let issues = JSON.parse(localStorage.getItem('issues')) || [];
+        let nextIssueId = parseInt(localStorage.getItem('nextIssueId')) || 1;
+        let nextCommentId = parseInt(localStorage.getItem('nextCommentId')) || 1;
+        
+        // DOM Elements
+        const issueForm = document.getElementById('issueForm');
+        const issuesContainer = document.getElementById('issuesContainer');
+        
+        // Format date for display
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('issues', JSON.stringify(issues));
+            localStorage.setItem('nextIssueId', nextIssueId.toString());
+            localStorage.setItem('nextCommentId', nextCommentId.toString());
+        }
+        
+        // Create a new issue
+        function createIssue(title, description) {
+            const newIssue = {
+                id: nextIssueId++,
+                title: title,
+                description: description,
+                date: new Date().toISOString(),
+                comments: []
+            };
+            
+            issues.unshift(newIssue);
+            saveData();
+            renderIssues();
+        }
+        
+        // Add a comment to an issue
+        function addComment(issueId, author, content) {
+            const issue = issues.find(issue => issue.id === issueId);
+            if (issue) {
+                issue.comments.push({
+                    id: nextCommentId++,
+                    author: author || 'Anonymous',
+                    content: content,
+                    date: new Date().toISOString()
+                });
+                saveData();
+                renderIssues();
+            }
+        }
+        
+        // Render all issues
+        function renderIssues() {
+            if (issues.length === 0) {
+                issuesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No issues yet</h3>
+                        <p>Be the first to suggest an issue or request a feature!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            issuesContainer.innerHTML = issues.map(issue => `
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <h3 class="issue-title">${issue.title}</h3>
+                        <div class="issue-date">${formatDate(issue.date)}</div>
+                    </div>
+                    <p class="issue-description">${issue.description}</p>
+                    
+                    <div class="comments-section">
+                        <h4>Comments (${issue.comments.length})</h4>
+                        
+                        ${issue.comments.length > 0 ? 
+                            issue.comments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-header">
+                                        <span class="comment-author">${comment.author}</span>
+                                        <span class="comment-date">${formatDate(comment.date)}</span>
+                                    </div>
+                                    <div class="comment-content">${comment.content}</div>
+                                </div>
+                            `).join('') : 
+                            '<p class="empty-state" style="padding: 10px 0; margin: 0;">No comments yet. Be the first to comment!</p>'
+                        }
+                        
+                        <form class="comment-form" data-issue-id="${issue.id}" style="margin-top: 15px;">
+                            <div class="form-group">
+                                <input type="text" placeholder="Your name (optional)" class="comment-author-input">
+                                <textarea placeholder="Add your comment..." class="comment-content-input" required></textarea>
+                            </div>
+                            <button type="submit" class="btn" style="padding: 10px 20px; font-size: 14px;">
+                                <i class="fas fa-comment"></i> Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to comment forms
+            document.querySelectorAll('.comment-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const issueId = parseInt(this.dataset.issueId);
+                    const authorInput = this.querySelector('.comment-author-input');
+                    const contentInput = this.querySelector('.comment-content-input');
+                    
+                    addComment(issueId, authorInput.value.trim(), contentInput.value.trim());
+                    
+                    // Reset form
+                    authorInput.value = '';
+                    contentInput.value = '';
+                });
+            });
+        }
+        
+        // Handle new issue submission
+        issueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('issueTitle').value.trim();
+            const description = document.getElementById('issueDescription').value.trim();
+            
+            if (title && description) {
+                createIssue(title, description);
+                
+                // Reset form
+                issueForm.reset();
+            }
+        });
+        
+        // Initial render
+        renderIssues();
+    </script>
+</body>
+</html>
